@@ -1,0 +1,43 @@
+cartoon-shorts/scripts/qa/engine-check.sh
+  s_57f1fd696dab3a::t_d2c7681a6c6660 17
+README.md
+  s_57f1fd696dab3a::t_d2c7681a6c6660 132,143-145,159
+  s_57f1fd696dab3a::t_b6b14ab3b44d4e 148-149
+cartoon-shorts/scripts/qa/film-shots.sh
+  s_57f1fd696dab3a::t_d2c7681a6c6660 29
+cartoon-shorts/scripts/qa/char-sheet/shoot.sh
+  s_57f1fd696dab3a::t_d2c7681a6c6660 8
+skill/cartoon-3d-short/SKILL.md
+  s_57f1fd696dab3a::t_027a11b69f7481 76,139
+cartoon-shorts/.gitignore
+  s_57f1fd696dab3a::t_7b1f92a74a90ac 2
+cartoon-shorts/cloud/remotion_modal.py
+  s_57f1fd696dab3a::t_d2c7681a6c6660 73-74,76,205
+cartoon-shorts/scripts/qa/ml-shots.sh
+  s_57f1fd696dab3a::t_d2c7681a6c6660 9
+cartoon-shorts/package.json
+  s_57f1fd696dab3a::t_d9c007433f5220 5
+  s_57f1fd696dab3a::t_4d813a992ab5ac 28
+cartoon-shorts/pnpm-workspace.yaml
+  s_57f1fd696dab3a::t_d2c7681a6c6660 1-2
+cartoon-shorts/README.md
+  s_57f1fd696dab3a::t_b6b14ab3b44d4e 5-15
+cartoon-shorts/pnpm-lock.yaml
+  s_57f1fd696dab3a::t_c10f474ebc72c5 1-2176
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5a16848ae006a1c25df92da7435c81f1a3d6c44d",
+  "prompts": {},
+  "sessions": {
+    "s_57f1fd696dab3a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1e873-cc8b-74d3-b6ea-da8e30e821a1",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "duyhiep2519 <duyhiep2519@gmail.com>"
+    }
+  }
+}
