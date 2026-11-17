@@ -1,0 +1,39 @@
+cartoon-shorts/README.md
+  s_57f1fd696dab3a::t_aec9a2fe449be0 45-54
+  s_57f1fd696dab3a::t_98b844a8b83e15 17-18
+cartoon-shorts/scripts/voice/test_voice_pipeline.py
+  s_57f1fd696dab3a::t_0d3277c8fe4da7 1-66
+cartoon-shorts/scripts/voice/voice_local.py
+  s_57f1fd696dab3a::t_228365914ceb1d 2,27,62-63,77-93,103-105,108-109
+  s_57f1fd696dab3a::t_0d3277c8fe4da7 8-10,12-13
+cartoon-shorts/scripts/voice/elevenlabs_tts.py
+  s_57f1fd696dab3a::t_228365914ceb1d 1-78
+cartoon-shorts/.env.example
+  s_57f1fd696dab3a::t_228365914ceb1d 3-5
+  s_57f1fd696dab3a::t_98b844a8b83e15 2
+cartoon-shorts/scripts/voice/narration.elevenlabs.example.json
+  s_57f1fd696dab3a::t_228365914ceb1d 1-13
+cartoon-shorts/scripts/voice/test_elevenlabs_tts.py
+  s_57f1fd696dab3a::t_aec9a2fe449be0 1-73
+README.md
+  s_57f1fd696dab3a::t_aec9a2fe449be0 173-220
+  s_57f1fd696dab3a::t_98b844a8b83e15 169,261,278
+cartoon-shorts/requirements.txt
+  s_57f1fd696dab3a::t_228365914ceb1d 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a5a30290d79c35fe80485b6041d7438cc897ac05",
+  "prompts": {},
+  "sessions": {
+    "s_57f1fd696dab3a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1e873-cc8b-74d3-b6ea-da8e30e821a1",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "duyhiep2519 <duyhiep2519@gmail.com>"
+    }
+  }
+}
