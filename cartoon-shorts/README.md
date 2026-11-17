@@ -14,8 +14,8 @@ Các video ngắn hoạt hình "nhân vật 2D trong thế giới 3D" (Remotion 
 | `backup/` | Khung chuẩn để kiểm tra engine, tự tạo bằng `scripts/qa/engine-check.sh save` (không kèm trong repo) |
 | `src/Root.tsx` | Đăng ký các video (hiện có `BridgeShort`) |
 | `public/kenney/` | Mô hình 3D Kenney (CC0), dùng chung |
-| `scripts/` | Công cụ, chia nhóm: `voice/` (thu và kiểm giọng, phụ đề), `render/` (khung thử, render trên máy, render Modal), `qa/` (kiểm khung, bảng ảnh, kiểm engine), `cloud/` (SaladCloud); `xuong.py` ghi tiến trình, `clean.sh` dọn file tạm |
-| `cloud/` | Render trên Modal (`remotion_modal.py`) và lô ảnh mẫu cho SaladCloud (`salad/`) |
+| `scripts/` | Công cụ, chia nhóm: `voice/` (thu và kiểm giọng, phụ đề), `render/` (khung thử, render trên máy, render Modal), `qa/` (kiểm khung, bảng ảnh, kiểm engine); `xuong.py` ghi tiến trình, `clean.sh` dọn file tạm |
+| `cloud/` | Render trên Modal (`remotion_modal.py`) |
 | `out/` | **Chỉ file tạm** (ảnh thử, bundle render, cache). Xoá lúc nào cũng được: `scripts/clean.sh` |
 | `node_modules/`, `.venv/` | Thư viện đã cài (Node, Python) |
 
@@ -42,6 +42,16 @@ python3 scripts/xuong.py start <tập> giong "..."
 
 ## Lệnh hay dùng (chạy trong thư mục này)
 
+Thu giọng bằng ElevenLabs: điền `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID` trong `.env`, chép
+`scripts/voice/narration.elevenlabs.example.json` thành `shorts/<tập>/voice/narration.json`, sửa lời đọc rồi chạy:
+
+```bash
+python3 scripts/voice/voice_local.py shorts/<tập>/voice
+```
+
+Xem hướng dẫn đầy đủ ở mục **Giọng đọc → ElevenLabs** trong `../README.md`.
+TTS local hiện có vẫn dùng cấu hình `engine`, `port`, `voice` (không cần `provider`).
+
 Render thử vài khung (ảnh ra `out/stills/`, bundle tạm tự xoá):
 ```bash
 COMP=BridgeShort node scripts/render/bridge-stills.mjs out/stills/x_ 60,700,1460 0.5
@@ -61,17 +71,6 @@ XUONG_EP=bridge scripts/render/render.sh BridgeShort shorts/bridge/audio/mix.wav
 Kiểm tra từng khung của video đã render (báo cáo ra `out/qa/`):
 ```bash
 .venv/bin/python scripts/qa/short_qa.py exports/bridge_2k.mp4 out/qa/bridge shorts/bridge/shots.json
-```
-
-Tạo ảnh AI và clip video AI trên GPU thuê của SaladCloud (RTX 4090 / 5090; máy tự tắt khi xong lô). Cần file `.env` (chép
-từ `.env.example`). Số máy tự tính theo số việc (1 máy cho 12 ảnh hoặc 2 clip, tối đa 8). Ảnh: Z-Image, mặc định 2048x1152,
-`"quality": "turbo"` hoặc `"best"` (bản gốc 25 bước, nét vẽ phẳng hơn). Video: Wan 2.2 biến một ảnh
-tĩnh thành clip 5 giây 1280x704. Xem đầu file `scripts/cloud/salad.py` để biết các lệnh `check`, `status`, `up`, `down`, `rm`:
-```bash
-python3 scripts/cloud/salad.py img cloud/salad/jobs-example.json --out out/salad/thu
-```
-```bash
-python3 scripts/cloud/salad.py video cloud/salad/video-example.json --out out/salad/clip
 ```
 
 Dọn toàn bộ file tạm (cho vào Thùng rác):

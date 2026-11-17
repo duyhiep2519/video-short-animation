@@ -1,0 +1,13 @@
+{
+  "provider": "elevenlabs",
+  "model_id": "eleven_flash_v2_5",
+  "language_code": "vi",
+  "speed": 1.0,
+  "lead": 0.12,
+  "tail": 0.6,
+  "lufs": -16.6,
+  "lines": [
+    {"pause": 0.0, "text": "Ngày xưa có một ngôi làng nhỏ."},
+    {"pause": 0.3, "text": "Bên cạnh làng là một dòng sông."}
+  ]
+}

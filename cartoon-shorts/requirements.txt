@@ -2,3 +2,4 @@ numpy
 pillow
 scipy
 modal
+python-dotenv>=1.0,<2

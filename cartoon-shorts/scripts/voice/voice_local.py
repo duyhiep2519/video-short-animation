@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
-"""Narration from a local text-to-speech server (your own TTS model, running on this machine).
+"""Narration from a local text-to-speech server or ElevenLabs (provider: "elevenlabs").
 
 Reads <voice dir>/narration.json:
   {"engine": "<model name>", "port": 7871, "voice": "<voice id>", "speed": 1.0, "lead": 0.12, "tail": 0.6, "lufs": -16.6,
    "lines": [{"pause": 0.0, "text": "..."}, ...]}            (pause = silence before the line, seconds)
 Writes voice.wav (48 kHz mono), words.json ({w, s, e, line}), lines.json ({i, text, s, e}), report.txt next to it.
-Each line is cached in out/cache/voice-local/ by (engine, voice, speed, text).
+Each line is cached in out/cache/voice-local/ by synthesis settings and text.
+ElevenLabs: set provider="elevenlabs", voice (or ELEVENLABS_VOICE_ID), model_id,
+optional language_code / voice_settings, and ELEVENLABS_API_KEY in .env or environment.
 
-The server is not part of this repo. It must answer  POST http://127.0.0.1:<port>/api/tts  with JSON
+For the default local provider, the server is not part of this repo. It must answer
+POST http://127.0.0.1:<port>/api/tts with JSON
   request:  {"text": "...", "voice": "...", "speed": 1.0}
   response: {"audio": "<base64 audio file>", "duration": <seconds>, "engine": "<model name>",
              "words": [{"start": <s>, "end": <s>}, ...]}      (one entry per whitespace-separated token of the text)
@@ -21,6 +24,7 @@ import argparse
 import base64
 import hashlib
 import json
+import os
 import subprocess
 import sys
 import urllib.request
@@ -55,6 +59,8 @@ def decode(path: Path) -> np.ndarray:
 
 
 def speech_bounds(x: np.ndarray) -> tuple[int, int]:
+    if not len(x) or not np.isfinite(x).all() or not np.any(x):
+        raise ValueError("TTS returned empty, silent or invalid audio")
     w = int(0.01 * SR)
     rms = np.sqrt(np.convolve(x * x, np.ones(w) / w, "same"))
     on = np.nonzero(rms > rms.max() * 10 ** (-42 / 20))[0]
@@ -68,7 +74,23 @@ def main() -> None:
     a = ap.parse_args()
     out = Path(a.dir)
     cfg = json.loads((out / "narration.json").read_text())
-    engine, port, voice, speed = cfg["engine"], int(cfg["port"]), cfg["voice"], float(cfg.get("speed", 1.0))
+    provider = cfg.get("provider", "local")
+    if provider not in ("local", "elevenlabs"):
+        raise ValueError("provider must be local or elevenlabs")
+    speed = float(cfg.get("speed", 1.0))
+    if provider == "elevenlabs":
+        from dotenv import load_dotenv
+        from elevenlabs_tts import settings, synthesize
+        load_dotenv(ROOT / ".env")
+        engine, port = "elevenlabs", None
+        voice = cfg.get("voice") or os.environ.get("ELEVENLABS_VOICE_ID", "")
+        if not isinstance(voice, str) or not voice.strip():
+            raise ValueError("Set voice in narration.json or ELEVENLABS_VOICE_ID in .env")
+        options = settings(cfg)
+    else:
+        engine, port, voice = cfg["engine"], int(cfg["port"]), cfg["voice"]
+    if not cfg.get("lines") or any(not line.get("text", "").strip() for line in cfg["lines"]):
+        raise ValueError("narration.json must contain non-empty lines of text")
     lead, tail, lufs = float(cfg.get("lead", 0.12)), float(cfg.get("tail", 0.6)), float(cfg.get("lufs", -16.6))
     CACHE.mkdir(parents=True, exist_ok=True)
     pieces, words, lines, report, warn = [], [], [], [], []
@@ -78,9 +100,13 @@ def main() -> None:
     for li, line in enumerate(cfg["lines"], 1):
         text = line["text"].strip()
         key = hashlib.sha1(f"{engine}|{voice}|{speed}|{text}".encode()).hexdigest()[:16]
+        if provider == "elevenlabs":
+            key = hashlib.sha256(json.dumps({"provider": provider, "voice": voice,
+                "text": text, **options}, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:24]
         wav, meta = CACHE / f"{key}.wav", CACHE / f"{key}.json"
         if not (wav.exists() and meta.exists()):
-            r = tts(port, text, voice, speed)
+            r = (synthesize(os.environ.get("ELEVENLABS_API_KEY", ""), voice, text, options)
+                 if provider == "elevenlabs" else tts(port, text, voice, speed))
             if r.get("engine") and r["engine"] != engine:
                 raise SystemExit(f"server on port {port} runs {r['engine']}, narration.json asks for {engine}")
             wav.write_bytes(base64.b64decode(r["audio"]))

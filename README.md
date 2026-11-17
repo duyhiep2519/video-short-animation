@@ -95,7 +95,6 @@ Bốn chặng, mười một bước. Mỗi bước ghi tiến trình vào `prog
 | 🔍 | Kiểm khung | ffmpeg, Python | `scripts/qa/short_qa.py` · `long_qa.py` | báo cáo `.md` |
 | 💬 | Phụ đề | Mốc thời gian từng chữ | `scripts/voice/make_srt.py` | `.srt` |
 | 📅 | Đăng bài | Facebook Graph API | [`autopost/`](autopost) | bài hẹn giờ |
-| 🧪 | Ảnh và clip AI *(tuỳ chọn)* | SaladCloud: Z-Image, Wan 2.2 | `scripts/cloud/salad.py` | ảnh, clip 5 giây |
 
 ### Một khung hình được dựng thế nào
 
@@ -167,11 +166,58 @@ Render bản cuối 2K trên Modal:
 EPISODE=bridge scripts/render/render-cloud.sh BridgeShort shorts/bridge/audio/mix.wav exports/bridge_2k.mp4
 ```
 
-Các lệnh khác (render trên máy, kiểm khung, SaladCloud) có trong [`cartoon-shorts/README.md`](cartoon-shorts/README.md).
+Các lệnh khác (render trên máy, kiểm khung) có trong [`cartoon-shorts/README.md`](cartoon-shorts/README.md).
 
 ## Giọng đọc
 
-Giọng đọc lấy từ model TTS chạy local của bạn. Script thu giọng gọi model qua một endpoint HTTP trên máy.
+Giọng đọc có thể dùng **ElevenLabs API** hoặc model TTS chạy local. Cả hai dùng chung script
+`scripts/voice/voice_local.py` và xuất `voice.wav`, `words.json`, `lines.json`, `report.txt`.
+
+### ElevenLabs
+
+Chạy các lệnh dưới đây trong `cartoon-shorts/`:
+
+1. Cài thư viện: `pip install -r requirements.txt`.
+2. Nếu chưa có `.env`, chép từ `.env.example`. Nếu đã có, thêm hai biến dưới đây vào file đó:
+
+   ```dotenv
+   ELEVENLABS_API_KEY=your-api-key
+   ELEVENLABS_VOICE_ID=your-voice-id
+   ```
+
+   Tạo API key có quyền Text to Speech trong tài khoản ElevenLabs; lấy Voice ID từ thư viện giọng.
+   Biến môi trường đã export được ưu tiên hơn `.env`. Không ghi API key vào `narration.json`.
+
+3. Tạo thư mục lời đọc và chép cấu hình mẫu:
+
+   ```bash
+   mkdir -p shorts/ten-tap/voice
+   cp scripts/voice/narration.elevenlabs.example.json shorts/ten-tap/voice/narration.json
+   ```
+
+4. Sửa `lines` trong `narration.json`, rồi thu giọng:
+
+   ```bash
+   python3 scripts/voice/voice_local.py shorts/ten-tap/voice
+   ```
+
+Mẫu dùng `eleven_flash_v2_5` và `language_code: "vi"` cho tiếng Việt. Có thể đổi sang model/ngôn ngữ
+được tài khoản hỗ trợ; nếu không khai báo model, mặc định là `eleven_multilingual_v2`.
+`voice` trong JSON ghi đè `ELEVENLABS_VOICE_ID`; `speed` từ 0.7 đến 1.2. Có thể thêm `voice_settings`
+theo API ElevenLabs (ví dụ `stability`, `similarity_boost`); `speed` cấp ngoài được ưu tiên.
+
+Không cần cài model TTS hay chạy server local. Cần Internet, FFmpeg và credit ElevenLabs; nội dung lời đọc
+được gửi đến dịch vụ. Script lấy timestamp của **văn bản gốc** rồi nhóm theo khoảng trắng để giữ đúng
+số chữ cho engine. Nếu API trả alignment thiếu hoặc không khớp, script báo lỗi thay vì đoán thời gian.
+
+Mỗi câu được cache trong `out/cache/voice-local/`, theo giọng, model, ngôn ngữ, tốc độ, thiết lập và nội dung.
+Chạy lại cùng cấu hình sẽ dùng cache; đổi cấu hình hoặc xoá cache sẽ gọi API lại và có thể tốn credit.
+Script không tự thử lại khi API lỗi. Dùng video thương mại cần kiểm tra quyền của giọng và gói ElevenLabs.
+Đổi lời đọc cho tập có sẵn có thể cần chỉnh lại timing của hình và trộn lại `mix.wav`.
+
+### TTS local
+
+Script thu giọng gọi model qua một endpoint HTTP trên máy. Server TTS không kèm trong repo.
 
 **Yêu cầu gửi đi**
 
@@ -212,7 +258,7 @@ Khoá và tài khoản điền vào file `.env`, chép từ `.env.example` cùng
 | Dịch vụ | Cần gì | Điền ở đâu |
 |---|---|---|
 | Modal | Tài khoản modal.com, chạy `modal token new` | `~/.modal.toml` (do Modal tự tạo) |
-| SaladCloud | API key, tên organization, project | `cartoon-shorts/.env` |
+| ElevenLabs | API key, Voice ID | `cartoon-shorts/.env` |
 | Facebook | App ID, Page ID, Page access token | `autopost/.env` |
 
 > [!IMPORTANT]
@@ -229,12 +275,11 @@ video-short-animation/
 │   ├── shorts/bridge/           Kịch bản, giọng, âm thanh của tập mẫu
 │   ├── audio/                   Thư viện tổng hợp nhạc và hiệu ứng
 │   ├── public/kenney/           Mô hình 3D
-│   ├── cloud/                   Render trên Modal, ảnh AI trên SaladCloud
+│   ├── cloud/                   Render trên Modal
 │   └── scripts/
 │       ├── voice/               Thu giọng, mốc thời gian, phụ đề
 │       ├── render/              Khung thử, render trên máy, render trên Modal
 │       ├── qa/                  Kiểm khung, bảng ảnh, bảng nhân vật, kiểm engine
-│       ├── cloud/               SaladCloud: ảnh AI, clip AI
 │       └── xuong.py             Ghi tiến trình 11 bước
 ├── skill/cartoon-3d-short/      Skill cho Claude Code
 ├── autopost/                    Hẹn giờ đăng Trang Facebook
