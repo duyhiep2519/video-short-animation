@@ -70,9 +70,10 @@ image = (
     .apt_install(*APT)
     .env({"NVIDIA_DRIVER_CAPABILITIES": "all", "NVIDIA_VISIBLE_DEVICES": "all"})
     .add_local_file(ROOT / "package.json", "/app/package.json", copy=True)
-    .add_local_file(ROOT / "package-lock.json", "/app/package-lock.json", copy=True)
+    .add_local_file(ROOT / "pnpm-lock.yaml", "/app/pnpm-lock.yaml", copy=True)
+    .add_local_file(ROOT / "pnpm-workspace.yaml", "/app/pnpm-workspace.yaml", copy=True)
     # Linux binaries (compositor, ffmpeg) come from the lockfile's optional linux-x64 packages; no dev deps needed
-    .run_commands("cd /app && npm ci --omit=dev --no-audit --no-fund --ignore-scripts")
+    .run_commands("corepack enable", "cd /app && pnpm install --prod --frozen-lockfile --ignore-scripts")
     .run_commands(
         "cd /app && node -e \"require('@remotion/renderer').ensureBrowser({chromeMode:'headless-shell'}).then(console.log)\"",
         "cd /app && node -e \"require('@remotion/renderer').ensureBrowser({chromeMode:'chrome-for-testing'}).then(console.log)\"",
@@ -201,7 +202,7 @@ def diagnose(gls: list[str], cmd: str = "") -> str:
         out.append(f"$ {c}\n{r.stdout}{r.stderr}")
     for g in gls:
         gl, mode = g.split("@") if "@" in g else (g, "chrome-for-testing")
-        r = sh(f"cd /app && timeout 120 npx remotion gpu --gl={gl} --chrome-mode={mode} 2>&1 | head -60")
+        r = sh(f"cd /app && timeout 120 pnpm exec remotion gpu --gl={gl} --chrome-mode={mode} 2>&1 | head -60")
         out.append(f"$ remotion gpu --gl={gl} --chrome-mode={mode}\n{r.stdout}{r.stderr}")
     return "\n".join(out)
 

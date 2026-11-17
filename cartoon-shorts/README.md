@@ -2,6 +2,17 @@
 
 Các video ngắn hoạt hình "nhân vật 2D trong thế giới 3D" (Remotion + three.js), làm bằng skill `cartoon-3d-short`.
 
+Cài phụ thuộc với pnpm 10.34.9 (phiên bản khóa trong `package.json`):
+
+```bash
+corepack enable
+pnpm install --frozen-lockfile
+pnpm studio
+```
+
+Chạy các lệnh trên trong thư mục này. Nếu bản Node.js không kèm Corepack, cài pnpm 10.34.9 theo
+[hướng dẫn pnpm](https://pnpm.io/installation). Commit `pnpm-lock.yaml` khi thay đổi phụ thuộc.
+
 ## Thư mục
 
 | Thư mục | Chứa gì |

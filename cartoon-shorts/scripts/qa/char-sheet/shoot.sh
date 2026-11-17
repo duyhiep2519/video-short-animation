@@ -5,7 +5,7 @@
 #   e.g. scripts/qa/char-sheet/shoot.sh gestA_ti gestB_ba outfits props fx
 cd "$(dirname "$0")"
 out=../../../out/char-sheet; mkdir -p $out
-../../../node_modules/.bin/esbuild sheet.src.txt --loader:.txt=ts --bundle --format=iife --outfile=$out/sheet.js --log-level=warning || exit 1
+pnpm exec esbuild sheet.src.txt --loader:.txt=ts --bundle --format=iife --outfile=$out/sheet.js --log-level=warning || exit 1
 echo '<!doctype html><meta charset="utf-8"><style>html,body{margin:0;background:#a9bcc6}canvas{display:block}</style><body><script src="sheet.js"></script></body>' > $out/sheet.html
 for s in "$@"; do
   nm=${s%%&*}

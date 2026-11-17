@@ -14,7 +14,7 @@ EPISODES=(
 base=backup/engine-baseline; tmp=out/engine-check/now
 mode=compare; only=""
 [[ $1 == save ]] && mode=save || only=$1
-npx tsc --noEmit || { echo "engine-check: typecheck failed"; exit 1; }
+pnpm exec tsc --noEmit || { echo "engine-check: typecheck failed"; exit 1; }
 rm -rf $tmp; mkdir -p $tmp $base
 bad=0
 for e in $EPISODES; do

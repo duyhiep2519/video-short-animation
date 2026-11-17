@@ -26,6 +26,6 @@ for (const [n, F, file] of [["long", LONG, "shots.json"], ["short", SHORT, "shot
   for (const s of d.shots) console.log(\`  \${String(s.id).padStart(3)} \${s.k.padEnd(16)} \${String(s.a).padStart(5)}-\${String(s.last).padEnd(5)} \${s.light.padEnd(7)} keys \${s.keys.join(",")}\`);
 }
 EOT
-node_modules/.bin/esbuild $dir/shots.entry.mts --bundle --platform=node --format=esm --outfile=$dir/shots.bundle.mjs --log-level=error --external:three --external:remotion \
+pnpm exec esbuild $dir/shots.entry.mts --bundle --platform=node --format=esm --outfile=$dir/shots.bundle.mjs --log-level=error --external:three --external:remotion \
   --banner:js='globalThis.document={createElement:()=>({getContext:()=>null,width:0,height:0,style:{}})};' && node $dir/shots.bundle.mjs $which
 r=$?; rm -f $dir/shots.entry.mts $dir/shots.bundle.mjs; exit $r

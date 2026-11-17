@@ -129,6 +129,7 @@ Bốn chặng, mười một bước. Mỗi bước ghi tiến trình vào `prog
 | Công cụ | Phiên bản |
 |---|---|
 | Node.js | 20 trở lên |
+| pnpm | 10.34.9 (khóa trong `packageManager`) |
 | Python | 3.12 trở lên |
 | ffmpeg | bản bất kỳ |
 
@@ -139,8 +140,12 @@ git clone https://github.com/DuongVuIT/video-short-animation.git
 ```
 
 ```bash
-cd video-short-animation/cartoon-shorts && npm ci
+cd video-short-animation/cartoon-shorts
+corepack enable
+pnpm install --frozen-lockfile
 ```
+
+Nếu bản Node.js không kèm Corepack, cài pnpm 10.34.9 theo [hướng dẫn pnpm](https://pnpm.io/installation).
 
 ```bash
 pip install -r requirements.txt
@@ -151,7 +156,7 @@ pip install -r requirements.txt
 Mở trình xem trước của Remotion:
 
 ```bash
-npx remotion studio src/index.ts
+pnpm studio
 ```
 
 Render ba khung thử của tập mẫu, ảnh ra `out/stills/`:
